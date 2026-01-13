@@ -1,0 +1,132 @@
+{% extends 'games/base.html' %}
+
+{% block title %}Список игр - GameTorrent{% endblock %}
+
+{% block content %}
+<div class="flex gap-6">
+    <!-- Основной контент -->
+    <div class="flex-1">
+        <!-- Поиск -->
+        <div class="mb-6">
+            <form method="get" class="flex gap-4">
+                <input 
+                    type="text" 
+                    name="q" 
+                    value="{{ query }}" 
+                    placeholder="Поиск игр..."
+                    class="flex-1 search-input px-4 py-2 rounded-lg"
+                >
+                <button type="submit" class="btn-primary">
+                    🔍 Поиск
+                </button>
+                {% if query or selected_category %}
+                    <a href="{% url 'game_list' %}" class="btn-primary">
+                        ✖ Сброс
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Результаты поиска -->
+        {% if query %}
+            <div class="mb-4 text-muted">
+                Найдено игр: {{ games.count }}
+            </div>
+        {% endif %}
+
+        <!-- Сетка игр -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for game in games %}
+                <div class="card-bg rounded-lg overflow-hidden hover-card cursor-pointer">
+                    <a href="{% url 'game_detail' game.pk %}" class="block">
+                        {% if game.image %}
+                            <img 
+                                src="{{ game.image.url }}" 
+                                alt="{{ game.name }}"
+                                class="w-full h-48 object-cover"
+                            >
+                        {% else %}
+                            <div class="w-full h-48 bg-slate-700 flex items-center justify-center">
+                                <span class="text-4xl">🎮</span>
+                            </div>
+                        {% endif %}
+                        
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold text-white mb-2">{{ game.name }}</h3>
+                            
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 bg-blue-600 text-xs rounded">{{ game.category }}</span>
+                                <span class="px-2 py-1 bg-green-600 text-xs rounded">{{ game.platform }}</span>
+                            </div>
+                            
+                            <p class="text-muted text-sm mb-3 line-clamp-2">
+                                {{ game.description|truncatewords:20 }}
+                            </p>
+                            
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-muted">📦 {{ game.memory }} ГБ</span>
+                                <span class="text-blue-400">Подробнее →</span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% empty %}
+                <div class="col-span-full text-center py-12">
+                    <div class="text-6xl mb-4">🎮</div>
+                    <h3 class="text-xl font-semibold text-white mb-2">Игры не найдены</h3>
+                    <p class="text-muted">
+                        {% if query %}
+                            Попробуйте изменить поисковый запрос
+                        {% else %}
+                            Игры пока не добавлены
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Боковая панель -->
+    <div class="w-64">
+        <div class="sidebar-bg rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-white mb-4">🏷️ Категории</h3>
+            
+            <ul class="space-y-2">
+                <li>
+                    <a 
+                        href="{% url 'game_list' %}" 
+                        class="block px-3 py-2 rounded {% if not selected_category %}bg-blue-600{% else %}hover:bg-slate-700{% endif %} transition"
+                    >
+                        Все игры
+                    </a>
+                </li>
+                {% for category_value, category_label in categories %}
+                    <li>
+                        <a 
+                            href="?category={{ category_value }}" 
+                            class="block px-3 py-2 rounded {% if selected_category == category_value %}bg-blue-600{% else %}hover:bg-slate-700{% endif %} transition"
+                        >
+                            {{ category_label }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Статистика -->
+        <div class="sidebar-bg rounded-lg p-4 mt-4">
+            <h3 class="text-lg font-semibold text-white mb-4">📊 Статистика</h3>
+            <div class="space-y-2 text-sm">
+                <div class="flex justify-between">
+                    <span class="text-muted">Всего игр:</span>
+                    <span class="text-white">{{ games.count }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-muted">Категорий:</span>
+                    <span class="text-white">{{ categories|length }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

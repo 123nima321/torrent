@@ -1,0 +1,174 @@
+{% extends 'games/base.html' %}
+
+{% block title %}{{ game.name }} - GameTorrent{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Навигация -->
+    <nav class="mb-6">
+        <a href="{% url 'game_list' %}" class="text-blue-400 hover:text-blue-300 transition">
+            ← Вернуться к списку игр
+        </a>
+    </nav>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Основная информация -->
+        <div class="lg:col-span-2">
+            <div class="card-bg rounded-lg overflow-hidden">
+                <!-- Изображение -->
+                {% if game.image %}
+                    <img 
+                        src="{{ game.image.url }}" 
+                        alt="{{ game.name }}"
+                        class="w-full h-96 object-cover"
+                    >
+                {% else %}
+                    <div class="w-full h-96 bg-slate-700 flex items-center justify-center">
+                        <span class="text-8xl">🎮</span>
+                    </div>
+                {% endif %}
+
+                <!-- Информация об игре -->
+                <div class="p-6">
+                    <h1 class="text-3xl font-bold text-white mb-4">{{ game.name }}</h1>
+                    
+                    <!-- Метки -->
+                    <div class="flex items-center gap-3 mb-6">
+                        <span class="px-3 py-1 bg-blue-600 rounded-full text-sm">{{ game.category }}</span>
+                        <span class="px-3 py-1 bg-green-600 rounded-full text-sm">{{ game.platform }}</span>
+                        <span class="px-3 py-1 bg-purple-600 rounded-full text-sm">📦 {{ game.memory }} ГБ</span>
+                    </div>
+
+                    <!-- Описание -->
+                    <div class="mb-6">
+                        <h2 class="text-xl font-semibold text-white mb-3">Описание</h2>
+                        <div class="text-gray-300 leading-relaxed">
+                            {{ game.description|linebreaks }}
+                        </div>
+                    </div>
+
+                    <!-- Кнопка скачивания -->
+                    <div class="flex gap-4">
+                        <button class="btn-primary text-lg px-6 py-3">
+                            ⬇️ Скачать торрент
+                        </button>
+                        <button class="btn-primary text-lg px-6 py-3">
+                            🔗 Magnet ссылка
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Боковая панель -->
+        <div class="lg:col-span-1">
+            <!-- Информация о файле -->
+            <div class="sidebar-bg rounded-lg p-4 mb-4">
+                <h3 class="text-lg font-semibold text-white mb-4">📁 Информация о файле</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-muted">Размер:</span>
+                        <span class="text-white">{{ game.memory }} ГБ</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Платформа:</span>
+                        <span class="text-white">{{ game.platform }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Категория:</span>
+                        <span class="text-white">{{ game.category }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Дата добавления:</span>
+                        <span class="text-white">{{ game.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Системные требования -->
+            <div class="sidebar-bg rounded-lg p-4 mb-4">
+                <h3 class="text-lg font-semibold text-white mb-4">💻 Системные требования</h3>
+                <div class="space-y-3 text-sm">
+                    <div>
+                        <div class="text-muted mb-1">ОС:</div>
+                        <div class="text-white">Windows 10/11 (64-bit)</div>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1">Процессор:</div>
+                        <div class="text-white">Intel Core i5 или AMD Ryzen 5</div>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1">Оперативная память:</div>
+                        <div class="text-white">8 ГБ</div>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1">Видеокарта:</div>
+                        <div class="text-white">GTX 1060 или RX 580</div>
+                    </div>
+                    <div>
+                        <div class="text-muted mb-1">Место на диске:</div>
+                        <div class="text-white">{{ game.memory }} ГБ</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Статистика раздачи -->
+            <div class="sidebar-bg rounded-lg p-4">
+                <h3 class="text-lg font-semibold text-white mb-4">📊 Статистика раздачи</h3>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-muted">Сидающие:</span>
+                        <span class="text-green-400">142</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Личающие:</span>
+                        <span class="text-yellow-400">28</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Скачано:</span>
+                        <span class="text-white">1,247 раз</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-muted">Добавлен:</span>
+                        <span class="text-white">{{ game.created_at|date:"d.m.Y" }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Похожие игры -->
+    {% if related_games %}
+        <div class="mt-12">
+            <h2 class="text-2xl font-bold text-white mb-6">🎮 Похожие игры</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {% for related_game in related_games %}
+                    <div class="card-bg rounded-lg overflow-hidden hover-card cursor-pointer">
+                        <a href="{% url 'game_detail' related_game.pk %}" class="block">
+                            {% if related_game.image %}
+                                <img 
+                                    src="{{ related_game.image.url }}" 
+                                    alt="{{ related_game.name }}"
+                                    class="w-full h-32 object-cover"
+                                >
+                            {% else %}
+                                <div class="w-full h-32 bg-slate-700 flex items-center justify-center">
+                                    <span class="text-2xl">🎮</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="p-3">
+                                <h4 class="font-semibold text-white text-sm mb-2">{{ related_game.name }}</h4>
+                                <div class="flex items-center gap-2 mb-2">
+                                    <span class="px-2 py-1 bg-blue-600 text-xs rounded">{{ related_game.category }}</span>
+                                    <span class="text-xs text-muted">{{ related_game.memory }} ГБ</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
