@@ -2,7 +2,7 @@ services:
   - type: web
     name: torrent_site
     env: python
-    buildCommand: "./build.sh"
+    buildCommand: "bash build.sh"
     startCommand: "gunicorn torrent_site.wsgi:application"
     envVars:
       - key: PYTHON_VERSION
